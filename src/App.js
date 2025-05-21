@@ -5,6 +5,8 @@ function App() {
   const [pokemonName, setPokemonName] = useState('pikachu');
   const [pokemonData, setPokemonData] = useState(null);
   const [input, setInput] = useState('');
+  const [evolutionChain, setEvolutionChain] = useState([]);
+
 
   useEffect(() => {
     fetchPokemon(pokemonName);
@@ -16,10 +18,34 @@ function App() {
       if (!res.ok) throw new Error('Pokémon not found');
       const data = await res.json();
       setPokemonData(data);
+
+      const speciesRes = await fetch(data.species.url);
+      const speciesData = await speciesRes.json();
+
+      const evolutionRes = await fetch(speciesData.evolution_chain.url);
+      const evolutionData = await evolutionRes.json();
+
+      const chain = [];
+      let current = evolutionData.chain;
+
+      while (current) {
+        chain.push(current.species.name);
+        current = current.evolves_to[0];
+      }
+
+      setEvolutionChain(chain);
+
     } catch (err) {
       console.error(err);
       setPokemonData(null);
+      setEvolutionChain([]);
     }
+  };
+
+  // Gets a random pokemon
+  const getRandomPokemon = () => {
+    const randomId = Math.floor(Math.random() * 898) + 1; // IDs from 1 to 898
+    fetchPokemon(randomId);
   };
 
   const handleSearch = (e) => {
@@ -41,6 +67,8 @@ function App() {
         <button type="submit">Search</button>
       </form>
 
+      <button onClick={getRandomPokemon}>Show Random Pokémon</button>
+
       {pokemonData ? (
         <div className="pokemon-card">
           <h2>{pokemonData.name.toUpperCase()}</h2>
@@ -52,6 +80,16 @@ function App() {
         </div>
       ) : (
         <p>Pokémon not found.</p>
+      )}
+       {evolutionChain.length > 0 && (
+        <div className = "evolution-chain">
+          <h3>Evolution Chain:</h3>
+          <ul>
+            {evolutionChain.map((name, index) => (
+              <li key = {index}>{name.charAt(0).toUpperCase() + name.slice(1)}</li>
+            ))}
+          </ul>
+        </div>
       )}
     </div>
   );
