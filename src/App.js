@@ -6,6 +6,8 @@ function App() {
   const [pokemonData, setPokemonData] = useState(null);
   const [input, setInput] = useState('');
   const [evolutionChain, setEvolutionChain] = useState([]);
+  const [evolutionSprites, setEvolutionSprites] = useState([]);
+
 
 
   useEffect(() => {
