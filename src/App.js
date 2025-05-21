@@ -68,7 +68,14 @@ function App() {
 
   return (
     <div className="App">
-      <h1>Pokedex</h1>
+      <div className="logo-container">
+       <img
+        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+        alt="Pokeball"
+        className="pokeball-logo"
+       />
+        <h1>Pokedex</h1>
+      </div>
       <form onSubmit={handleSearch}>
         <input
           type="text"
