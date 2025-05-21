@@ -35,6 +35,18 @@ function App() {
 
       setEvolutionChain(chain);
 
+      const spritePromises = chain.map(async (name) => {
+        const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name}`);
+        const data = await res.json();
+        return {
+          name,
+          sprite: data.sprites.front_default,
+        };
+      });
+      
+      const sprites = await Promise.all(spritePromises);
+      setEvolutionSprites(sprites);
+
     } catch (err) {
       console.error(err);
       setPokemonData(null);
@@ -84,12 +96,15 @@ function App() {
        {evolutionChain.length > 0 && (
         <div className = "evolution-chain">
           <h3>Evolution Chain:</h3>
-          <ul>
-            {evolutionChain.map((name, index) => (
-              <li key = {index}>{name.charAt(0).toUpperCase() + name.slice(1)}</li>
+          <div className = "evolution-list">
+            {evolutionSprites.map((stage, index) => (
+              <div className = "evolution-stage" key = {index}>
+                <img src = {stage.sprite} alt = {stage.name} />
+                <p>{stage.name.charAt(0).toUpperCase() + stage.name.slice(1)}</p>
+              </div>
             ))}
-          </ul>
         </div>
+      </div>
       )}
     </div>
   );
