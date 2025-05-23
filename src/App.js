@@ -16,7 +16,7 @@ function App() {
 
   const fetchPokemon = async (name) => {
     try {
-      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${name.toLowerCase()}`);
+      const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${String(nameOrId).toLowerCase()}`);
       if (!res.ok) throw new Error('Pokémon not found');
       const data = await res.json();
       setPokemonData(data);
@@ -78,17 +78,20 @@ function App() {
        />
         <h1>Pokedex</h1>
       </div>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Search Pokémon"
-        />
-        <button type="submit">Search</button>
-      </form>
-
-      <button onClick={getRandomPokemon}>Show Random Pokémon</button>
+      <div className="search-controls">
+        <form onSubmit={handleSearch} className="search-form">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Search Pokémon"
+          />
+          <button type="submit">Search</button>
+        </form>
+        <button onClick={getRandomPokemon} className="random-button">
+          🎲 Random
+        </button>
+      </div>
 
       {pokemonData ? (
         <div className="pokemon-card">
