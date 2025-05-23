@@ -14,7 +14,7 @@ function App() {
     fetchPokemon(pokemonName);
   }, [pokemonName]);
 
-  const fetchPokemon = async (name) => {
+  const fetchPokemon = async (nameOrId) => {
     try {
       const res = await fetch(`https://pokeapi.co/api/v2/pokemon/${String(nameOrId).toLowerCase()}`);
       if (!res.ok) throw new Error('Pokémon not found');
