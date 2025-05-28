@@ -79,15 +79,13 @@ function App() {
         <h1>Pokedex</h1>
       </div>
       <div className="search-controls">
-        <form onSubmit={handleSearch} className="search-form">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Search Pokémon"
-          />
-          <button type="submit">Search</button>
-        </form>
+        <input
+          type="text"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          placeholder="Search Pokémon"
+        />
+        <button type="submit" onClick={handleSearch}>Search</button>
         <button onClick={getRandomPokemon} className="random-button">
           🎲 Random
         </button>
