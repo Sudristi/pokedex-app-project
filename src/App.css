@@ -212,3 +212,28 @@ pokemon-card img {
 .random-button:hover {
   background-color: #2a2a99;
 }
+
+.type-filter {
+  margin: 1.5rem 0;
+}
+
+.type-filter label {
+  margin-right: 0.5rem;
+  font-weight: 600;
+}
+
+.matchups {
+  margin-top: 2rem;
+  text-align: left;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.matchup {
+  background: #fefefe;
+  padding: 1rem;
+  border-radius: 1rem;
+  margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}

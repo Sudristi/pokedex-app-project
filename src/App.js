@@ -7,12 +7,34 @@ function App() {
   const [input, setInput] = useState('');
   const [evolutionChain, setEvolutionChain] = useState([]);
   const [evolutionSprites, setEvolutionSprites] = useState([]);
-
-
+  const [allTypes, setAllTypes] = useState([]);
+  const [selectedType, setSelectedType] = useState('');
+  const [typeMatchups, setTypeMatchups] = useState([]);
 
   useEffect(() => {
     fetchPokemon(pokemonName);
   }, [pokemonName]);
+
+  useEffect(() => {
+    const fetchTypes = async () => {
+      const res = await fetch('https://pokeapi.co/api/v2/type');
+      const data = await res.json();
+      setAllTypes(data.results.map(type => type.name));
+    };
+    fetchTypes();
+  }, []);
+
+  useEffect(() => {
+    const fetchPokemonByType = async () => {
+      if (!selectedType) return;
+      const res = await fetch(`https://pokeapi.co/api/v2/type/${selectedType}`);
+      const data = await res.json();
+      const pokemonList = data.pokemon.map(p => p.pokemon.name);
+      const randomName = pokemonList[Math.floor(Math.random() * pokemonList.length)];
+      fetchPokemon(randomName);
+    };
+    fetchPokemonByType();
+  }, [selectedType]);
 
   const fetchPokemon = async (nameOrId) => {
     try {
@@ -49,6 +71,20 @@ function App() {
       const sprites = await Promise.all(spritePromises);
       setEvolutionSprites(sprites);
 
+      const typeNames = data.types.map(t => t.type.name);
+      const matchupPromises = typeNames.map(async (type) => {
+        const res = await fetch(`https://pokeapi.co/api/v2/type/${type}`);
+        const data = await res.json();
+        return {
+          name: type,
+          double_damage_from: data.damage_relations.double_damage_from.map(d => d.name),
+          double_damage_to: data.damage_relations.double_damage_to.map(d => d.name),
+        };
+      });
+
+      const matchups = await Promise.all(matchupPromises);
+      setTypeMatchups(matchups);
+
     } catch (err) {
       console.error(err);
       setPokemonData(null);
@@ -71,13 +107,14 @@ function App() {
   return (
     <div className="App">
       <div className="logo-container">
-       <img
-        src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
-        alt="Pokeball"
-        className="pokeball-logo"
-       />
+        <img
+          src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png"
+          alt="Pokeball"
+          className="pokeball-logo"
+        />
         <h1>Pokedex</h1>
       </div>
+
       <div className="search-controls">
         <input
           type="text"
@@ -89,6 +126,22 @@ function App() {
         <button onClick={getRandomPokemon} className="random-button">
           🎲 Random
         </button>
+      </div>
+
+      <div className="type-filter">
+        <label htmlFor="type">Filter by Type:</label>
+        <select
+          id="type"
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+        >
+          <option value="">-- All Types --</option>
+          {allTypes.map((type) => (
+            <option key={type} value={type}>
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </option>
+          ))}
+        </select>
       </div>
 
       {pokemonData ? (
@@ -103,18 +156,32 @@ function App() {
       ) : (
         <p>Pokémon not found.</p>
       )}
-       {evolutionChain.length > 0 && (
-        <div className = "evolution-chain">
+
+      {evolutionChain.length > 0 && (
+        <div className="evolution-chain">
           <h3>Evolution Chain:</h3>
-          <div className = "evolution-list">
+          <div className="evolution-list">
             {evolutionSprites.map((stage, index) => (
-              <div className = "evolution-stage" key = {index}>
-                <img src = {stage.sprite} alt = {stage.name} />
+              <div className="evolution-stage" key={index}>
+                <img src={stage.sprite} alt={stage.name} />
                 <p>{stage.name.charAt(0).toUpperCase() + stage.name.slice(1)}</p>
               </div>
             ))}
+          </div>
         </div>
-      </div>
+      )}
+
+      {typeMatchups.length > 0 && (
+        <div className="matchups">
+          <h3>Type Strengths & Weaknesses</h3>
+          {typeMatchups.map((matchup, index) => (
+            <div key={index} className="matchup">
+              <h4>{matchup.name.toUpperCase()}</h4>
+              <p><strong>Strong Against:</strong> {matchup.double_damage_to.join(', ') || 'None'}</p>
+              <p><strong>Weak Against:</strong> {matchup.double_damage_from.join(', ') || 'None'}</p>
+            </div>
+          ))}
+        </div>
       )}
     </div>
   );
